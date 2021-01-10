@@ -8,10 +8,46 @@ output:
 
 ## Loading and preprocessing the data
 
+Unzip data to obtain the csv file
+
+``` r
+library("data.table")
+library(ggplot2)
+
+fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+download.file(fileUrl, destfile = paste0(getwd(), '/repdata%2Fdata%2Factivity.zip'), method = "curl")
+unzip("repdata%2Fdata%2Factivity.zip",exdir = "data")
+```
+
+Reading .csv data into data.table
+
+``` r
+activityDT <- data.table::fread(input = "data/activity.csv")
+```
 
 
 ## What is mean total number of steps taken per day?
 
+Calculating the total number of steps taken per day
+
+``` r
+Total_Steps <- activityDT[, c(lapply(.SD, sum, na.rm = FALSE)), .SDcols = c("steps"), by = .(date)] 
+
+head(Total_Steps, 10)
+```
+
+Making a histogram of the total steps taken per day
+
+``` r
+ggplot(Total_Steps, aes(x = steps)) +
+    geom_histogram(fill = "red", binwidth = 1000) +
+    labs(title = "Daily Steps", x = "Steps", y = "Frequency")
+```
+Calculating the mean and median of the total number of steps taken per day
+
+``` r
+Total_Steps[, .(Mean_Steps = mean(steps, na.rm = TRUE), Median_Steps = median(steps, na.rm = TRUE))]
+```
 
 
 ## What is the average daily activity pattern?
